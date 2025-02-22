@@ -33,34 +33,20 @@ export const App = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setText(e.target.value);
   };
-
-  const handleEdit = (id: number, value: string) => {
-    setTodos((todos) => {
-      const newTodos = todos.map((todo) => {
-        console.log(`id: ${todo.id}, value: ${todo.value}`);
-
-        if (todo.id === id) {
-          return { ...todo, value };
-        }
-        return todo;
-      });
-      return newTodos;
-    });
-  };
-
-  const handleChecked = (id: number, checked: boolean) => {
-    setTodos((todos) =>
-      todos.map((todo) => (todo.id === id ? { ...todo, checked } : todo))
-    );
-  };
-  const handleRemove = (id: number, removed: boolean) => {
-    setTodos((todos) =>
-      todos.map((todo) => (todo.id === id ? { ...todo, removed } : todo))
-    );
-  };
-
   const handleEmpty = () => {
     setTodos((todos) => todos.filter((todo) => !todo.removed));
+  };
+
+  const handleToDo = <K extends keyof ToDo, V extends ToDo[K]>(
+    id: number,
+    key: K,
+    value: V
+  ) => {
+    setTodos((todos) => {
+      return todos.map((todo) =>
+        todo.id === id ? { ...todo, [key]: value } : todo
+      );
+    });
   };
 
   const filteredTodos = todos.filter((todo) => {
@@ -109,15 +95,17 @@ export const App = () => {
               type="checkbox"
               disabled={todo.removed}
               checked={todo.checked}
-              onChange={(e) => handleChecked(todo.id, e.target.checked)}
+              onChange={() => handleToDo(todo.id, "checked", !todo.checked)}
             />
             <input
               type="text"
               disabled={todo.checked || todo.removed}
               value={todo.value}
-              onChange={(e) => handleEdit(todo.id!, e.target.value)}
+              onChange={(e) => handleToDo(todo.id!, "value", e.target.value)}
             />
-            <button onClick={() => handleRemove(todo.id, !todo.removed)}>
+            <button
+              onClick={() => handleToDo(todo.id, "removed", !todo.removed)}
+            >
               {todo.removed ? "Undo" : "Remove"}
             </button>
           </li>
