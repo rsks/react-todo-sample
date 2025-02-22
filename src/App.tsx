@@ -48,11 +48,9 @@ export const App = () => {
     });
   };
 
-  const handleChecked = (id: number) => {
+  const handleChecked = (id: number, checked: boolean) => {
     setTodos((todos) =>
-      todos.map((todo) =>
-        todo.id === id ? { ...todo, checked: !todo.checked } : todo
-      )
+      todos.map((todo) => (todo.id === id ? { ...todo, checked } : todo))
     );
   };
   const handleRemove = (id: number, removed: boolean) => {
@@ -111,7 +109,7 @@ export const App = () => {
               type="checkbox"
               disabled={todo.removed}
               checked={todo.checked}
-              onChange={() => handleChecked(todo.id)}
+              onChange={(e) => handleChecked(todo.id, e.target.checked)}
             />
             <input
               type="text"
