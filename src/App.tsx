@@ -2,13 +2,11 @@ import { useState } from "react";
 
 import "./App.css";
 
-type ToDo = {
-  value: string;
-  readonly id: number;
-  checked: boolean;
-  removed: boolean;
-};
-type Filter = "all" | "checked" | "unchecked" | "removed";
+import { FormDialog } from "./FormDialog";
+import { ActionButton } from "./ActionButton";
+import { SideBar } from "./SideBar";
+import { TodoItem } from "./TodoItem";
+
 export const App = () => {
   const [text, setText] = useState("");
   const [todos, setTodos] = useState<ToDo[]>([]);
@@ -49,68 +47,12 @@ export const App = () => {
     });
   };
 
-  const filteredTodos = todos.filter((todo) => {
-    if (filter === "all") return true;
-    if (filter === "checked") return todo.checked && !todo.removed;
-    if (filter === "unchecked") return !todo.checked && !todo.removed;
-    if (filter === "removed") return todo.removed;
-    return true;
-  });
-
   return (
     <div>
-      <select
-        defaultValue="all"
-        onChange={(e) => handleFilter(e.target.value as Filter)}
-      >
-        <option value="all">すべてのタスク</option>
-        <option value="checked">完了したタスク</option>
-        <option value="unchecked">現在のタスク</option>
-        <option value="removed">ごみ箱</option>
-      </select>
-      {filter === "removed" ? (
-        <button
-          disabled={todos.filter((todo) => todo.removed).length === 0}
-          onClick={() => handleEmpty()}
-        >
-          Clear
-        </button>
-      ) : (
-        filter !== "checked" && (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSubmit();
-            }}
-          >
-            <input type="text" value={text} onChange={(e) => handleChange(e)} />
-            <input type="submit" value="Add" onSubmit={handleSubmit} />
-          </form>
-        )
-      )}
-      <ul>
-        {filteredTodos.map((todo) => (
-          <li key={todo.id}>
-            <input
-              type="checkbox"
-              disabled={todo.removed}
-              checked={todo.checked}
-              onChange={() => handleToDo(todo.id, "checked", !todo.checked)}
-            />
-            <input
-              type="text"
-              disabled={todo.checked || todo.removed}
-              value={todo.value}
-              onChange={(e) => handleToDo(todo.id!, "value", e.target.value)}
-            />
-            <button
-              onClick={() => handleToDo(todo.id, "removed", !todo.removed)}
-            >
-              {todo.removed ? "Undo" : "Remove"}
-            </button>
-          </li>
-        ))}
-      </ul>
+      <SideBar handleFilter={handleFilter} />
+      <ActionButton todos={todos} handleEmpty={handleEmpty} />
+      <FormDialog text={text} onSubmit={handleSubmit} onChange={handleChange} />
+      <TodoItem todos={todos} filter={filter} onTodo={handleToDo} />
     </div>
   );
 };
